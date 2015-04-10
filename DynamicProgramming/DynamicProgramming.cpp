@@ -106,6 +106,7 @@ long knapsack(long bagSize)
 		}
 	}
 	return val;
+
 }
 
 long recurseKnapsack(const vector<knapsackItems>& items, int index, long sizeLeft, 
