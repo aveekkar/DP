@@ -14,6 +14,7 @@
 #include <boost/numeric/ublas/io.hpp>
 using namespace std;
 
+
 typedef struct
 	{
 		long size;
@@ -26,10 +27,26 @@ long knapsack(long bagSize);
 long recurseKnapsack(const vector<knapsackItems>& items, int index, long sizeLeft, boost::numeric::ublas::matrix<long>& cache
 					 , boost::numeric::ublas::matrix<bool>& taken);
 
+int longestCommonSubsequence(const string& left, const string& right);
+int lcsRecurse(const string& left, const string& right, int leftIndex, int rightIndex, boost::numeric::ublas::matrix<int>& cache);
+void reverseString(string& str);
+
 int main(int argc, char* argv)
 {
+	//call fibonacci...
 	cout<<fibonacci(9999)<<endl;
+
+	//call Knapsack...
 	cout<<knapsack(2000)<<endl;
+
+	//call LCS..
+	longestCommonSubsequence("empty bottle", "nematode knowledge");
+
+	//call stringReverse...
+	string toReverse = "AVEEKA";
+	reverseString(toReverse);
+	cout<<"Reversed: "<<toReverse<<endl;
+
 	getchar();
 	return 0;
 }
@@ -145,6 +162,113 @@ long recurseKnapsack(const vector<knapsackItems>& items, int index, long sizeLef
 	return returnValue;
 
 }
+
+int longestCommonSubsequence(const string& left, const string& right)
+{
+	int leftSize = left.size();
+	int rightSize = right.size();
+
+	boost::numeric::ublas::matrix<int> cache(leftSize + 1, rightSize + 1, -1);
+
+	int longestCommonSubsequenceLength = lcsRecurse(left, right, 0, 0, cache);
+
+	int i = 0;
+	int j = 0;
+	stringstream match;
+
+	while(i < leftSize && j < rightSize)
+	{
+		if(left[i] == right[j])
+		{
+			match<<left[i];
+			++i;
+			++j;
+		}
+		else if(cache(i + 1, j) > cache(i, j + 1))
+		{
+			++i;
+		}
+		else
+		{
+			++j;
+		}
+	}
+
+	string matchReverse = match.str();
+	cout<<"left: "<<left<<endl;
+	cout<<"right: "<<right<<endl;
+	cout<<"Longest sequence: "<<matchReverse<<endl;
+	return longestCommonSubsequenceLength;
+}
+
+int lcsRecurse(const string& left, const string& right, int leftIndex, int rightIndex, boost::numeric::ublas::matrix<int>& cache)
+{
+	if(cache(leftIndex, rightIndex) != -1)
+	{
+		return cache(leftIndex, rightIndex); 
+	}
+
+	if(leftIndex == left.size() || rightIndex == right.size())
+	{
+		cache(leftIndex, rightIndex) = 0;
+	}
+	else if(left[leftIndex] == right[rightIndex])
+	{
+		cache(leftIndex, rightIndex) = 1 + lcsRecurse(left, right, leftIndex + 1, rightIndex + 1, cache);
+	}
+	else
+	{
+		int a = lcsRecurse(left, right, leftIndex + 1, rightIndex, cache);
+		int b = lcsRecurse(left, right, leftIndex, rightIndex + 1, cache);
+		cache(leftIndex, rightIndex) = a > b ? a : b;
+	}
+
+	return cache(leftIndex, rightIndex);
+}
+
+
+void reverseString(string& str)
+{
+	if(str.size() == 0 || str.size() == 1)
+	{
+		return;
+	}
+
+	int mirrorLeft = -1;
+	int mirrorRight = -1;
+	if(str.size() % 2 == 0)
+	{
+		mirrorRight = str.size() / 2;
+		mirrorLeft = mirrorRight - 1;
+	}
+	else
+	{
+		mirrorLeft = mirrorRight = str.size() / 2;
+	}
+
+	while(mirrorLeft != str.size())
+	{
+		char temp = str[mirrorLeft];
+		str[mirrorLeft] = str[mirrorRight];
+		str[mirrorRight] = temp;
+		++mirrorLeft;
+		--mirrorRight;
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
