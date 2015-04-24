@@ -30,6 +30,8 @@ long recurseKnapsack(const vector<knapsackItems>& items, int index, long sizeLef
 int longestCommonSubsequence(const string& left, const string& right);
 int lcsRecurse(const string& left, const string& right, int leftIndex, int rightIndex, boost::numeric::ublas::matrix<int>& cache);
 void reverseString(string& str);
+int longestPalindromicSubsequence(const string& input, string& palindrome);
+int LpsRecurse(const string& input, int begin, int end, boost::numeric::ublas::matrix<int>& cache);
 
 int main(int argc, char* argv)
 {
@@ -46,6 +48,12 @@ int main(int argc, char* argv)
 	string toReverse = "AVEEKA";
 	reverseString(toReverse);
 	cout<<"Reversed: "<<toReverse<<endl;
+
+	//Longest palindromic subsequence
+	string output;
+	string input = "ZZYAZBXXBAZ";
+	cout<<"longest: "<<longestPalindromicSubsequence(input, output)<<endl;
+	cout<<"Palindrome: "<<output<<endl;
 
 	getchar();
 	return 0;
@@ -255,6 +263,79 @@ void reverseString(string& str)
 		--mirrorRight;
 	}
 }
+
+
+int longestPalindromicSubsequence(const string& input, string& palindrome)
+{
+	palindrome = "";
+	boost::numeric::ublas::matrix<int> cache(input.size(), input.size(), -1);
+	int longest = LpsRecurse(input, 0, input.size() - 1, cache);
+	int i = input.size() - 1;
+	int j = 0;
+
+	while(j <= input.size() - 1 && i >= 0)
+	{
+		if(input[i] == input[j] || i == j)
+		{
+			palindrome += input[i];
+			--i;
+			++j;
+		}
+		else
+		{
+			if(cache(i -1, j) > cache(i, j - 1))
+			{
+				--i;
+			}
+			else
+			{
+				++j;
+			}
+		}
+	}
+
+	palindrome += palindrome[0];
+
+	return longest;
+}
+
+
+int LpsRecurse(const string& input, int begin, int end, boost::numeric::ublas::matrix<int>& cache)
+{
+	if(cache(begin, end) != -1)
+	{
+		return cache(begin, end);
+	}
+	if(end < begin)
+	{
+		cache(begin, end) = 0;
+	}
+	else if(begin + 1 == end && input[begin] == input[end])
+	{
+		cache(begin, end) = 2;
+	}
+	else if(begin == end)
+	{
+		cache(begin, end) = 1;
+	}
+	else
+	{
+		if(input[begin] == input[end])
+		{
+			cache(begin, end) = 2 + LpsRecurse(input, begin + 1, end - 1, cache);
+		}
+		else
+		{
+			int a = LpsRecurse(input, begin + 1, end, cache);
+			int b = LpsRecurse(input, begin, end - 1, cache);
+			cache(begin, end) = a > b ? a : b;
+		}
+	}
+
+	return cache(begin, end);
+}
+
+
 
 
 
