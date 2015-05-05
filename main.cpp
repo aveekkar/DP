@@ -3,6 +3,7 @@
 #include "boost/numeric/ublas/matrix.hpp"
 #include <vector>
 #include <limits>
+#include <unordered_set>
 
 int MIN = std::numeric_limits<int>::min();
 
@@ -10,6 +11,7 @@ using namespace std;
 
 int maxValueSubsequence(const vector<int>& input, int& start, int& end);
 int maxValSubsequeceRecurse(const vector<int>& input, vector<int>& cache, int index, int& start, int& end);
+bool wordBreak(const string& s, unordered_set<string>& dict);
 
 int main(int argc, char **argv)
 {
@@ -24,6 +26,11 @@ int main(int argc, char **argv)
 	int start = 0;
 	int end = 0;
 	cout<<maxValueSubsequence(inputForMVS, start, end)<<endl;
+	
+	//word break...
+	unordered_set<string> dict = {"aaaa","aa","a"};
+	cout<<"word break?? "<<wordBreak("aaaaaaaa", dict)<<endl;
+	
 	getchar();
 	return 0;
 }
@@ -67,6 +74,74 @@ int maxValSubsequeceRecurse(const vector<int>& input, vector<int>& cache, int in
 	
 	return cache[index];
 }
+
+
+bool wordBreak(const string& s, unordered_set<string>& dict)
+{
+	int len = s.size();
+	if(len == 0)
+	{
+		return false;
+	}
+	int **matrix = new int *[len];
+	for(int i = 0; i < len; ++i)
+	{
+		matrix[i] = new int[len];
+	}
+	
+	for(int i = 0; i < len; ++i)
+	{
+		for(int j = 0; j < len; ++j)
+		{
+			matrix[i][j] = -1;
+		}
+	}
+	
+	for(int i = 0; i < len; ++i)
+	{
+		for(int j = i; j < len; ++j)
+		{
+			string subString = s.substr(i, j -i + 1);
+			if(dict.find(subString) != dict.end())
+			{
+				matrix[i][j] = 1;
+			}
+			else
+			{
+				matrix[i][j] = 0;
+			}
+		}
+	}
+
+	
+	for(int i = 0; i < len; ++i)
+	{
+		for(int j = i; j < len; ++j)
+		{
+			for(int k = i; k < j; ++k)
+			{
+				if (matrix[i][j] != 1)
+				{
+					matrix[i][j] = ((matrix[i][k] == 1) && (matrix[k + 1][j] == 1)) ? 1 : 0;
+				}
+			}
+		}
+	}
+         
+        
+	bool ret = matrix[0][len - 1] == 1;
+	
+	for(int i = 0; i < len; ++i)
+	{
+		delete[] matrix[i];
+	}
+	delete[] matrix;
+	
+	return ret;
+}
+
+
+
 
 
 
