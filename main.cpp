@@ -12,6 +12,7 @@ using namespace std;
 int maxValueSubsequence(const vector<int>& input, int& start, int& end);
 int maxValSubsequeceRecurse(const vector<int>& input, vector<int>& cache, int index, int& start, int& end);
 bool wordBreak(const string& s, unordered_set<string>& dict);
+void recurseMatrix(int** matrix, int j, vector<vector<string> >& results, const string& s, vector<string>& temp);
 
 int main(int argc, char **argv)
 {
@@ -30,6 +31,9 @@ int main(int argc, char **argv)
 	//word break...
 	unordered_set<string> dict = {"aaaa","aa","a"};
 	cout<<"word break?? "<<wordBreak("aaaaaaaa", dict)<<endl;
+	
+	//unordered_set<string> dict = {"ga","gas","skate", "ate", "kate"};
+	//cout<<"word break?? "<<wordBreak("gaskate", dict)<<endl;
 	
 	getchar();
 	return 0;
@@ -112,7 +116,19 @@ bool wordBreak(const string& s, unordered_set<string>& dict)
 			}
 		}
 	}
-
+	
+	vector<vector<string> > results;
+	vector<string> temp;
+	temp.push_back(" ");
+	recurseMatrix(matrix, 0, results, s, temp);
+	for(vector<vector<string> >::const_iterator i = results.begin(); i != results.end(); ++i)
+	{
+		for(vector<string>::const_iterator j = i->begin(); j != i->end(); ++j)
+		{
+			cout<<(*j)<<" ";
+		}
+		cout<<endl;
+	}
 	
 	for(int i = 0; i < len; ++i)
 	{
@@ -138,6 +154,30 @@ bool wordBreak(const string& s, unordered_set<string>& dict)
 	delete[] matrix;
 	
 	return ret;
+}
+
+void recurseMatrix(int** matrix, int j, vector<vector<string> >& results, const string& s, vector<string>& temp)
+{	
+	int i = j;
+	if(j == s.length())
+	{
+		results.push_back(temp);
+		return;
+	}
+	for(;j < s.length(); ++j)
+	{
+		if(matrix[i][j] == 1)
+		{
+			string subString = s.substr(0, j -i + 1);
+			temp.push_back(subString);
+			recurseMatrix(matrix, j + 1, results, s, temp);
+			if(!temp.empty())
+			{
+				temp.pop_back();
+			}
+		}
+	}
+	
 }
 
 
